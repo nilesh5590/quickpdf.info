@@ -1,0 +1,5 @@
+# QuickPDF.info
+> QuickPDF is a 100% client-side, privacy-focused browser utility suite for document management.
+
+- Main URL: https://quickpdf.info/
+- Features: Free browser-based PDF merging, splitting, compression, conversion, digital signing, and OCR text extraction. No files are uploaded to external servers.
