@@ -120,7 +120,7 @@
         const canvas = document.getElementById('sig-canvas');
         const ctx = canvas.getContext('2d');
         let drawing = false;
-        let loadedPdfBytes = null; // Pristine copy for saving
+        let loadedPdfBytes = null;
         let originalFileName = '';
         let activeSignatureDataUrl = null;
 
@@ -181,8 +181,8 @@
             reader.onload = async function(event) {
                 const rawBuffer = event.target.result;
                 
-                // Keep a separate copy for PDF-Lib so PDF.js doesn't detach/empty it
-                loadedPdfBytes = rawBuffer.slice(0); 
+                // Store a deep copy using Uint8Array to avoid reference locking or buffer detachment issues
+                loadedPdfBytes = new Uint8Array(rawBuffer);
 
                 uploadBox.classList.add('hidden');
                 workspace.classList.remove('hidden');
@@ -313,12 +313,15 @@
 
             try {
                 const { PDFDocument } = PDFLib;
-                // Load from our independent clone buffer
-                const pdfDoc = await PDFDocument.load(loadedPdfBytes);
+                
+                // Load PDF Document with standard options fallback
+                const pdfDoc = await PDFDocument.load(loadedPdfBytes, { ignoreEncryption: true });
                 const pages = pdfDoc.getPages();
+                
                 if (!pages || pages.length === 0) {
-                    throw new Error("The uploaded PDF has no pages.");
+                    throw new Error("This PDF structure doesn't expose standard pages or may be protected.");
                 }
+                
                 const page = pages[0]; 
                 const { width: pdfWidth, height: pdfHeight } = page.getSize();
 
