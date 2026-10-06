@@ -7,8 +7,8 @@
     <meta name="description" content="Draw or upload your signature, place it anywhere on your PDF document, and sign securely in your browser.">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PDF-Lib CDN -->
-    <script src="https://unpkg.com/pdf-lib@1.4.0/dist/pdf-lib.min.js"></script>
+    <!-- Robust PDF-Lib CDN v1.17.1 -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <!-- PDF.js CDN for rendering pages for interactive placement -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
@@ -120,7 +120,7 @@
         const canvas = document.getElementById('sig-canvas');
         const ctx = canvas.getContext('2d');
         let drawing = false;
-        let loadedPdfBytes = null;
+        let loadedPdfBytes = null; // Pristine copy for saving
         let originalFileName = '';
         let activeSignatureDataUrl = null;
 
@@ -172,23 +172,31 @@
             }
         }
 
-        fileInput.addEventListener('change', async (e) => {
+        fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
             originalFileName = file.name;
-            loadedPdfBytes = await file.arrayBuffer();
-            uploadBox.classList.add('hidden');
-            workspace.classList.remove('hidden');
+            const reader = new FileReader();
+            reader.onload = async function(event) {
+                const rawBuffer = event.target.result;
+                
+                // Keep a separate copy for PDF-Lib so PDF.js doesn't detach/empty it
+                loadedPdfBytes = rawBuffer.slice(0); 
 
-            try {
-                const loadingTask = pdfjsLib.getDocument({ data: loadedPdfBytes });
-                pdfDocProxy = await loadingTask.promise;
-                renderPagePreview(1);
-            } catch (err) {
-                console.error(err);
-                alert('Failed to load PDF preview.');
-            }
+                uploadBox.classList.add('hidden');
+                workspace.classList.remove('hidden');
+
+                try {
+                    const loadingTask = pdfjsLib.getDocument({ data: rawBuffer });
+                    pdfDocProxy = await loadingTask.promise;
+                    renderPagePreview(1);
+                } catch (err) {
+                    console.error("PDF Preview Load Error:", err);
+                    alert('Failed to load PDF preview.');
+                }
+            };
+            reader.readAsArrayBuffer(file);
         });
 
         async function renderPagePreview(pageNum) {
@@ -305,6 +313,7 @@
 
             try {
                 const { PDFDocument } = PDFLib;
+                // Load from our independent clone buffer
                 const pdfDoc = await PDFDocument.load(loadedPdfBytes);
                 const pages = pdfDoc.getPages();
                 if (!pages || pages.length === 0) {
