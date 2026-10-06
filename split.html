@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Split PDF Files Online Free - QuickPDF</title>
+    <meta name="description" content="Separate PDF pages or extract specific page ranges into new documents securely in your browser. Fast, free, and privacy-focused.">
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PDF-Lib CDN for browser-based PDF manipulation -->
+    <script src="https://unpkg.com/pdf-lib@1.4.0/dist/pdf-lib.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
+        <a href="index.html" class="text-xl font-bold text-blue-600">QuickPDF.info</a>
+        <nav class="space-x-4 text-sm font-medium">
+            <a href="index.html" class="hover:text-blue-600">Home</a>
+            <a href="merge.html" class="hover:text-blue-600">Merge PDF</a>
+            <a href="split.html" class="text-blue-600 font-semibold">Split PDF</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-2xl mx-auto px-4 py-12 flex-grow w-full text-center">
+        <h2 class="text-3xl font-extrabold mb-2">Split PDF Document</h2>
+        <p class="text-gray-600 mb-8">Extract specific pages or page ranges from your PDF instantly.</p>
+
+        <!-- Dropzone / Upload Box -->
+        <div class="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 shadow-sm hover:border-blue-500 transition cursor-pointer" id="drop-zone">
+            <input type="file" id="file-input" accept=".pdf" class="hidden">
+            <div onclick="document.getElementById('file-input').click()">
+                <svg class="w-12 h-12 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <p class="text-lg font-semibold mb-1">Click to select a PDF file</p>
+                <p class="text-sm text-gray-400">or drag and drop your file here</p>
+            </div>
+        </div>
+
+        <!-- Split Controls Container (Hidden initially) -->
+        <div id="split-controls" class="mt-6 bg-white border p-6 rounded-xl shadow-sm text-left hidden">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h3 id="file-name" class="font-bold text-gray-800 truncate max-w-xs"></h3>
+                    <p id="page-count" class="text-sm text-gray-500"></p>
+                </div>
+                <button onclick="resetTool()" class="text-sm text-red-500 hover:text-red-700 font-medium">Change File</button>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Enter Page Range to Extract (e.g., 1-3 or 5):</label>
+                <input type="text" id="range-input" placeholder="e.g., 1-3" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="text-xs text-gray-400 mt-1">Note: Page numbers start at 1.</p>
+            </div>
+            
+            <button id="split-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow transition">
+                Extract & Split PDF
+            </button>
+        </div>
+
+        <!-- Status Message -->
+        <p id="status-message" class="mt-4 text-sm font-medium text-blue-600 hidden"></p>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t py-4 text-center text-xs text-gray-400">
+        &copy; 2026 QuickPDF.info. 100% Client-Side Privacy Guaranteed.
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const dropZone = document.getElementById('drop-zone');
+        const splitControls = document.getElementById('split-controls');
+        const fileNameEl = document.getElementById('file-name');
+        const pageCountEl = document.getElementById('page-count');
+        const rangeInput = document.getElementById('range-input');
+        const splitBtn = document.getElementById('split-btn');
+        const statusMessage = document.getElementById('status-message');
+
+        let loadedPdfBytes = null;
+        let totalPages = 0;
+        let originalFileName = '';
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            originalFileName = file.name;
+            fileNameEl.textContent = file.name;
+            statusMessage.textContent = 'Loading PDF...';
+            statusMessage.classList.remove('hidden');
+
+            try {
+                loadedPdfBytes = await file.arrayBuffer();
+                const { PDFDocument } = PDFLib;
+                const pdfDoc = await PDFDocument.load(loadedPdfBytes);
+                totalPages = pdfDoc.getPageCount();
+
+                pageCountEl.textContent = `Total Pages: ${totalPages}`;
+                dropZone.classList.add('hidden');
+                splitControls.classList.remove('hidden');
+                statusMessage.classList.add('hidden');
+            } catch (error) {
+                console.error(error);
+                statusMessage.textContent = 'Failed to load PDF. Please make sure it is a valid file.';
+            }
+        });
+
+        window.resetTool = function() {
+            fileInput.value = '';
+            loadedPdfBytes = null;
+            totalPages = 0;
+            splitControls.classList.add('hidden');
+            dropZone.classList.remove('hidden');
+            statusMessage.classList.add('hidden');
+            rangeInput.value = '';
+        }
+
+        splitBtn.addEventListener('click', async () => {
+            const rangeStr = rangeInput.value.trim();
+            if (!rangeStr) {
+                alert('Please enter a page range (e.g., 1-3 or 2).');
+                return;
+            }
+
+            statusMessage.textContent = 'Splitting PDF securely in your browser...';
+            statusMessage.classList.remove('hidden');
+            splitBtn.disabled = true;
+
+            try {
+                const { PDFDocument } = PDFLib;
+                const sourcePdf = await PDFDocument.load(loadedPdfBytes);
+                const newPdf = await PDFDocument.create();
+
+                // Parse page range string (Supports single page "3" or range "1-3")
+                let pagesToExtract = [];
+                if (rangeStr.includes('-')) {
+                    const parts = rangeStr.split('-').map(p => parseInt(p.trim(), 10));
+                    const start = parts[0];
+                    const end = parts[1];
+                    if (isNaN(start) || isNaN(end) || start < 1 || end > totalPages || start > end) {
+                        throw new Error('Invalid page range.');
+                    }
+                    for (let i = start; i <= end; i++) {
+                        pagesToExtract.push(i - 1); // PDF-Lib uses 0-based index
+                    }
+                } else {
+                    const pageNum = parseInt(rangeStr, 10);
+                    if (isNaN(pageNum) || pageNum < 1 || pageNum > totalPages) {
+                        throw new Error('Invalid page number.');
+                    }
+                    pagesToExtract.push(pageNum - 1);
+                }
+
+                const copiedPages = await newPdf.copyPages(sourcePdf, pagesToExtract);
+                copiedPages.forEach(page => newPdf.addPage(page));
+
+                const newPdfBytes = await newPdf.save();
+
+                // Trigger download
+                const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `split-${originalFileName}`;
+                link.click();
+
+                statusMessage.textContent = 'Success! Your extracted pages have been downloaded.';
+            } catch (error) {
+                console.error(error);
+                statusMessage.textContent = error.message || 'An error occurred while splitting the file.';
+            } finally {
+                splitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
