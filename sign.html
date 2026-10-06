@@ -117,7 +117,6 @@
         const positionContainer = document.getElementById('position-container');
         const statusMessage = document.getElementById('status-message');
 
-        // Signature Creator Elements
         const canvas = document.getElementById('sig-canvas');
         const ctx = canvas.getContext('2d');
         let drawing = false;
@@ -125,7 +124,6 @@
         let originalFileName = '';
         let activeSignatureDataUrl = null;
 
-        // PDF Preview Elements
         const pdfCanvas = document.getElementById('pdf-canvas');
         const pdfCtx = pdfCanvas.getContext('2d');
         const draggableSig = document.getElementById('draggable-sig');
@@ -135,7 +133,6 @@
         let pdfDocProxy = null;
         let viewportScale = 1.0;
 
-        // Setup Drawing Canvas
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 2.5;
         ctx.lineCap = 'round';
@@ -175,7 +172,6 @@
             }
         }
 
-        // Handle PDF Upload
         fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -185,7 +181,6 @@
             uploadBox.classList.add('hidden');
             workspace.classList.remove('hidden');
 
-            // Load PDF preview using PDF.js
             try {
                 const loadingTask = pdfjsLib.getDocument({ data: loadedPdfBytes });
                 pdfDocProxy = await loadingTask.promise;
@@ -209,7 +204,6 @@
             await page.render({ canvasContext: pdfCtx, viewport: scaledViewport }).promise;
         }
 
-        // Apply Signature & Open Positioning Tool
         async function applySignatureToPreview() {
             const isUploadTab = !document.getElementById('panel-upload').classList.contains('hidden');
             
@@ -241,7 +235,7 @@
             positionContainer.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Dragging Logic for Signature Box on Preview
+        // Dragging Logic
         let isDragging = false;
         let startX, startY;
 
@@ -293,7 +287,6 @@
 
         window.addEventListener('touchend', () => { isDragging = false; });
 
-        // Helper function to convert base64 Data URL to Uint8Array safely for pdf-lib
         function dataURLtoUint8Array(dataURL) {
             const base64String = dataURL.split(',')[1];
             const binaryString = atob(base64String);
@@ -305,7 +298,6 @@
             return bytes;
         }
 
-        // Confirm & Stamp Final PDF using PDF-Lib
         confirmDownloadBtn.addEventListener('click', async () => {
             statusMessage.textContent = 'Stamping signature onto PDF and generating final file...';
             statusMessage.classList.remove('hidden');
@@ -314,7 +306,11 @@
             try {
                 const { PDFDocument } = PDFLib;
                 const pdfDoc = await PDFDocument.load(loadedPdfBytes);
-                const page = pdfDoc.getPages()[0]; 
+                const pages = pdfDoc.getPages();
+                if (!pages || pages.length === 0) {
+                    throw new Error("The uploaded PDF has no pages.");
+                }
+                const page = pages[0]; 
                 const { width: pdfWidth, height: pdfHeight } = page.getSize();
 
                 const previewLeft = draggableSig.offsetLeft;
@@ -328,12 +324,14 @@
                 const finalX = previewLeft * scaleFactor;
                 const finalY = pdfHeight - ((previewTop + previewHeight) * scaleFactor);
 
-                // Convert base64 data URL to raw byte array safely
                 const sigImageBytes = dataURLtoUint8Array(activeSignatureDataUrl);
                 
-                const embeddedSig = activeSignatureDataUrl.includes('image/jpeg') 
-                    ? await pdfDoc.embedJpg(sigImageBytes) 
-                    : await pdfDoc.embedPng(sigImageBytes);
+                let embeddedSig;
+                if (activeSignatureDataUrl.includes('image/jpeg')) {
+                    embeddedSig = await pdfDoc.embedJpg(sigImageBytes);
+                } else {
+                    embeddedSig = await pdfDoc.embedPng(sigImageBytes);
+                }
 
                 page.drawImage(embeddedSig, {
                     x: finalX,
@@ -346,13 +344,13 @@
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `signed-${originalFileName}`;
+                link.download = `signed-${originalFileName || 'document.pdf'}`;
                 link.click();
 
                 statusMessage.textContent = 'Success! Your signed PDF has been downloaded.';
             } catch (err) {
-                console.error(err);
-                statusMessage.textContent = 'Error stamping signature. Please try again.';
+                console.error("DETAILED SIGNING ERROR:", err);
+                statusMessage.textContent = `Error stamping signature: ${err.message || 'Please try again.'}`;
             } finally {
                 confirmDownloadBtn.disabled = false;
             }
