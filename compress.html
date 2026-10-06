@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compress & Convert PDF Online Free - QuickPDF</title>
-    <meta name="description" content="Reduce PDF file size and convert images to PDF securely in your browser. Fast, free, and privacy-first document tools.">
-    <!-- Tailwind CSS for styling -->
+    <meta name="description" content="Reduce PDF file size significantly and convert images to PDF securely in your browser. Fast, free, and privacy-first document tools.">
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PDF-Lib CDN for browser-based PDF manipulation -->
+    <!-- PDF-Lib CDN -->
     <script src="https://unpkg.com/pdf-lib@1.4.0/dist/pdf-lib.min.js"></script>
+    <!-- PDF.js CDN for rendering pages to canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
 
@@ -26,7 +31,7 @@
     <!-- Main Content -->
     <main class="max-w-2xl mx-auto px-4 py-12 flex-grow w-full text-center">
         <h2 class="text-3xl font-extrabold mb-2">Compress & Convert PDF</h2>
-        <p class="text-gray-600 mb-8">Optimize PDF sizes or convert images (JPG/PNG) into a single PDF instantly.</p>
+        <p class="text-gray-600 mb-8">Significantly reduce heavy PDF file sizes or turn images into a single PDF.</p>
 
         <!-- Mode Selector Tabs -->
         <div class="flex justify-center mb-6 space-x-2">
@@ -41,12 +46,12 @@
                 <svg class="w-12 h-12 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
                 </svg>
-                <p class="text-lg font-semibold mb-1">Click to select PDF to optimize</p>
-                <p class="text-sm text-gray-400">Restructures document metadata and objects for a leaner file</p>
+                <p class="text-lg font-semibold mb-1">Click to select PDF to compress</p>
+                <p class="text-sm text-gray-400">Re-encodes pages to dramatically decrease file size</p>
             </div>
         </div>
 
-        <!-- Convert Section (Hidden by default) -->
+        <!-- Convert Section -->
         <div id="section-convert" class="space-y-4 hidden">
             <div class="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 shadow-sm hover:border-blue-500 transition cursor-pointer" onclick="document.getElementById('convert-input').click()">
                 <input type="file" id="convert-input" multiple accept="image/jpeg, image/png" class="hidden">
@@ -54,11 +59,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
                 <p class="text-lg font-semibold mb-1">Click to select JPG/PNG images</p>
-                <p class="text-sm text-gray-400">Select multiple images to combine them into a single PDF</p>
+                <p class="text-sm text-gray-400">Combine multiple images into a single PDF</p>
             </div>
         </div>
 
-        <!-- Status Message -->
+        <!-- Status Message & Progress -->
         <p id="status-message" class="mt-6 text-sm font-medium text-blue-600 hidden"></p>
     </main>
 
@@ -66,6 +71,9 @@
     <footer class="bg-white border-t py-4 text-center text-xs text-gray-400">
         &copy; 2026 QuickPDF.info. 100% Client-Side Privacy Guaranteed.
     </footer>
+
+    <!-- Hidden Canvas for Rendering -->
+    <canvas id="render-canvas" class="hidden"></canvas>
 
     <!-- JavaScript Logic -->
     <script>
@@ -90,32 +98,67 @@
             statusMessage.classList.add('hidden');
         }
 
-        // Compress Handler
+        // Advanced Compression Handler (Renders PDF pages to compressed JPEGs)
         document.getElementById('compress-input').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            statusMessage.textContent = 'Optimizing and cleaning PDF structure locally...';
+            const originalSize = file.size;
+            statusMessage.textContent = 'Loading PDF for deep compression...';
             statusMessage.classList.remove('hidden');
 
             try {
                 const arrayBuffer = await file.arrayBuffer();
+                const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+                const pdfDoc = await loadingTask.promise;
+                const numPages = pdfDoc.numPages;
+
                 const { PDFDocument } = PDFLib;
-                const pdfDoc = await PDFDocument.load(arrayBuffer);
-                
-                // Save with object compression enabled
-                const compressedPdfBytes = await pdfDoc.save({ useObjectStreams: true });
+                const newPdfDoc = await PDFDocument.create();
+                const canvas = document.getElementById('render-canvas');
+                const context = canvas.getContext('2d');
+
+                for (let i = 1; i <= numPages; i++) {
+                    statusMessage.textContent = `Compressing page ${i} of ${numPages}...`;
+                    const page = await pdfDoc.getPage(i);
+                    
+                    // Set scale to 1.0 (balanced resolution for readability vs file size reduction)
+                    const viewport = page.getViewport({ scale: 1.0 });
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+                    // Compress canvas image into JPEG format with 0.65 quality factor
+                    const compressedImageDataType = canvas.toDataURL('image/jpeg', 0.65);
+                    const imageBytes = await fetch(compressedImageDataType).then(res => res.arrayBuffer());
+                    
+                    const embeddedImage = await newPdfDoc.embedJpg(imageBytes);
+                    const newPage = newPdfDoc.addPage([viewport.width, viewport.height]);
+                    newPage.drawImage(embeddedImage, {
+                        x: 0,
+                        y: 0,
+                        width: viewport.width,
+                        height: viewport.height,
+                    });
+                }
+
+                statusMessage.textContent = 'Finalizing compressed PDF...';
+                const compressedPdfBytes = await newPdfDoc.save();
 
                 const blob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `optimized-${file.name}`;
+                link.download = `compressed-${file.name}`;
                 link.click();
 
-                statusMessage.textContent = `Success! Optimized file downloaded (Original: ${(file.size/1024).toFixed(1)} KB).`;
+                const newSize = blob.size;
+                const savings = Math.max(0, ((1 - (newSize / originalSize)) * 100)).toFixed(1);
+
+                statusMessage.textContent = `Success! Compressed from ${(originalSize/1024/1024).toFixed(2)} MB to ${(newSize/1024/1024).toFixed(2)} MB (${savings}% reduction).`;
             } catch (error) {
                 console.error(error);
-                statusMessage.textContent = 'Error compressing file. Please try a different PDF.';
+                statusMessage.textContent = 'Error compressing file. Please try another PDF.';
             }
         });
 
@@ -140,7 +183,7 @@
                     } else if (file.type === 'image/png') {
                         embeddedImage = await pdfDoc.embedPng(imageBytes);
                     } else {
-                        continue; // Skip unsupported formats
+                        continue;
                     }
 
                     const page = pdfDoc.addPage([embeddedImage.width, embeddedImage.height]);
