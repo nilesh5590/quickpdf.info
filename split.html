@@ -3,174 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Split PDF Files Online Free - QuickPDF</title>
-    <meta name="description" content="Separate PDF pages or extract specific page ranges into new documents securely in your browser. Fast, free, and privacy-focused.">
-    <!-- Tailwind CSS for styling -->
+    <title>Split PDF - Extract Pages Online | QuickPDF</title>
+    <meta name="description" content="Separate PDF pages or extract specific page ranges securely in your browser.">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PDF-Lib CDN for browser-based PDF manipulation -->
-    <script src="https://unpkg.com/pdf-lib@1.4.0/dist/pdf-lib.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { ilp: { red: '#EB3D3F', darkred: '#D62E30', dark: '#3E4853', light: '#F8F9FA' } }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+<body class="bg-ilp-light text-ilp-dark font-sans min-h-screen flex flex-col antialiased">
 
-    <!-- Header -->
-    <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
-        <a href="index.html" class="text-xl font-bold text-blue-600">QuickPDF.info</a>
-        <nav class="space-x-4 text-sm font-medium">
-            <a href="index.html" class="hover:text-blue-600">Home</a>
-            <a href="merge.html" class="hover:text-blue-600">Merge PDF</a>
-            <a href="split.html" class="text-blue-600 font-semibold">Split PDF</a>
-        </nav>
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
+            <div class="flex items-center space-x-8">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <div class="w-9 h-9 bg-ilp-red rounded-lg flex items-center justify-center text-white font-black text-xl shadow-md">Q</div>
+                    <span class="text-xl font-bold tracking-tight text-ilp-dark">Quick<span class="text-ilp-red">PDF</span></span>
+                </a>
+                <nav class="hidden md:flex space-x-6 text-sm font-semibold text-gray-600">
+                    <a href="merge.html" class="hover:text-ilp-red transition">Merge PDF</a>
+                    <a href="split.html" class="text-ilp-red font-semibold">Split PDF</a>
+                    <a href="compress.html" class="hover:text-ilp-red transition">Compress PDF</a>
+                    <a href="sign.html" class="hover:text-ilp-red transition">Sign PDF</a>
+                    <a href="ocr.html" class="hover:text-ilp-red transition">OCR Text</a>
+                </nav>
+            </div>
+            <div><a href="index.html" class="text-sm font-semibold text-gray-500 hover:text-ilp-red transition">&larr; All Tools</a></div>
+        </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-2xl mx-auto px-4 py-12 flex-grow w-full text-center">
-        <h2 class="text-3xl font-extrabold mb-2">Split PDF Document</h2>
-        <p class="text-gray-600 mb-8">Extract specific pages or page ranges from your PDF instantly.</p>
-
-        <!-- Dropzone / Upload Box -->
-        <div class="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 shadow-sm hover:border-blue-500 transition cursor-pointer" id="drop-zone">
-            <input type="file" id="file-input" accept=".pdf" class="hidden">
-            <div onclick="document.getElementById('file-input').click()">
-                <svg class="w-12 h-12 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                </svg>
-                <p class="text-lg font-semibold mb-1">Click to select a PDF file</p>
-                <p class="text-sm text-gray-400">or drag and drop your file here</p>
-            </div>
+    <main class="flex-grow max-w-4xl mx-auto px-4 py-12 w-full flex flex-col items-center">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-black text-ilp-dark tracking-tight mb-2">SPLIT PDF DOCUMENT</h1>
+            <p class="text-gray-500 text-base">Extract specific pages or split your PDF into independent files.</p>
         </div>
 
-        <!-- Split Controls Container (Hidden initially) -->
-        <div id="split-controls" class="mt-6 bg-white border p-6 rounded-xl shadow-sm text-left hidden">
-            <div class="flex justify-between items-center mb-4">
-                <div>
-                    <h3 id="file-name" class="font-bold text-gray-800 truncate max-w-xs"></h3>
-                    <p id="page-count" class="text-sm text-gray-500"></p>
-                </div>
-                <button onclick="resetTool()" class="text-sm text-red-500 hover:text-red-700 font-medium">Change File</button>
+        <div id="upload-box" class="w-full max-w-xl bg-white border-2 border-dashed border-gray-300 rounded-3xl p-10 shadow-sm hover:border-ilp-red transition cursor-pointer text-center group" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input" accept=".pdf" class="hidden">
+            <div class="w-20 h-20 bg-red-50 text-ilp-red rounded-full flex items-center justify-center mx-auto mb-5 group-hover:scale-105 transition shadow-inner">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </div>
+            <h3 class="text-xl font-bold text-ilp-dark mb-1">Select PDF file</h3>
+            <p class="text-sm text-gray-400">or drop PDF here</p>
+            <div class="mt-6 inline-block bg-ilp-red hover:bg-ilp-darkred text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition">Select PDF File</div>
+        </div>
 
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Enter Page Range to Extract (e.g., 1-3 or 5):</label>
-                <input type="text" id="range-input" placeholder="e.g., 1-3" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <p class="text-xs text-gray-400 mt-1">Note: Page numbers start at 1.</p>
+        <div id="workspace" class="hidden w-full max-w-2xl bg-white border border-gray-200 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6">
+            <h3 id="file-info" class="font-bold text-ilp-dark text-lg border-b pb-3"></h3>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Page Range to Extract (e.g., 1-3 or 2)</label>
+                <input type="text" id="page-range" placeholder="e.g. 1-3" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-ilp-red outline-none">
             </div>
-            
-            <button id="split-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow transition">
-                Extract & Split PDF
+            <button id="split-btn" class="w-full bg-ilp-red hover:bg-ilp-darkred text-white font-extrabold py-4 rounded-2xl shadow-lg transition tracking-wide text-lg">
+                Split PDF & Download &rarr;
             </button>
         </div>
 
-        <!-- Status Message -->
-        <p id="status-message" class="mt-4 text-sm font-medium text-blue-600 hidden"></p>
+        <p id="status-message" class="mt-6 text-sm font-semibold text-ilp-red text-center hidden bg-red-50 px-4 py-2.5 rounded-xl border border-red-100"></p>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t py-4 text-center text-xs text-gray-400">
-        &copy; 2026 QuickPDF.info. 100% Client-Side Privacy Guaranteed.
+    <footer class="bg-ilp-dark text-gray-400 text-xs py-8 mt-auto border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2 text-white font-bold text-sm"><div class="w-6 h-6 bg-ilp-red rounded flex items-center justify-center text-xs">Q</div><span>QuickPDF.info</span></div>
+            <div>&copy; 2026 QuickPDF &bull; 100% Secure Client-Side Processing</div>
+        </div>
     </footer>
 
-    <!-- JavaScript Logic -->
     <script>
+        let loadedPdfBytes = null;
+        let originalFileName = '';
         const fileInput = document.getElementById('file-input');
-        const dropZone = document.getElementById('drop-zone');
-        const splitControls = document.getElementById('split-controls');
-        const fileNameEl = document.getElementById('file-name');
-        const pageCountEl = document.getElementById('page-count');
-        const rangeInput = document.getElementById('range-input');
+        const uploadBox = document.getElementById('upload-box');
+        const workspace = document.getElementById('workspace');
+        const fileInfo = document.getElementById('file-info');
+        const pageRangeInput = document.getElementById('page-range');
         const splitBtn = document.getElementById('split-btn');
         const statusMessage = document.getElementById('status-message');
-
-        let loadedPdfBytes = null;
-        let totalPages = 0;
-        let originalFileName = '';
 
         fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-
             originalFileName = file.name;
-            fileNameEl.textContent = file.name;
-            statusMessage.textContent = 'Loading PDF...';
-            statusMessage.classList.remove('hidden');
+            loadedPdfBytes = await file.arrayBuffer();
 
-            try {
-                loadedPdfBytes = await file.arrayBuffer();
-                const { PDFDocument } = PDFLib;
-                const pdfDoc = await PDFDocument.load(loadedPdfBytes);
-                totalPages = pdfDoc.getPageCount();
-
-                pageCountEl.textContent = `Total Pages: ${totalPages}`;
-                dropZone.classList.add('hidden');
-                splitControls.classList.remove('hidden');
-                statusMessage.classList.add('hidden');
-            } catch (error) {
-                console.error(error);
-                statusMessage.textContent = 'Failed to load PDF. Please make sure it is a valid file.';
-            }
+            uploadBox.classList.add('hidden');
+            workspace.classList.remove('hidden');
+            fileInfo.textContent = `Loaded: ${file.name}`;
         });
 
-        window.resetTool = function() {
-            fileInput.value = '';
-            loadedPdfBytes = null;
-            totalPages = 0;
-            splitControls.classList.add('hidden');
-            dropZone.classList.remove('hidden');
-            statusMessage.classList.add('hidden');
-            rangeInput.value = '';
-        }
-
         splitBtn.addEventListener('click', async () => {
-            const rangeStr = rangeInput.value.trim();
+            const rangeStr = pageRangeInput.value.trim();
             if (!rangeStr) {
-                alert('Please enter a page range (e.g., 1-3 or 2).');
+                alert('Please enter a page range.');
                 return;
             }
 
-            statusMessage.textContent = 'Splitting PDF securely in your browser...';
+            statusMessage.textContent = 'Extracting pages...';
             statusMessage.classList.remove('hidden');
             splitBtn.disabled = true;
 
             try {
                 const { PDFDocument } = PDFLib;
-                const sourcePdf = await PDFDocument.load(loadedPdfBytes);
+                const srcPdf = await PDFDocument.load(loadedPdfBytes, { ignoreEncryption: true });
                 const newPdf = await PDFDocument.create();
+                
+                const totalPages = srcPdf.getPageCount();
+                let indices = [];
 
-                // Parse page range string (Supports single page "3" or range "1-3")
-                let pagesToExtract = [];
                 if (rangeStr.includes('-')) {
-                    const parts = rangeStr.split('-').map(p => parseInt(p.trim(), 10));
-                    const start = parts[0];
-                    const end = parts[1];
-                    if (isNaN(start) || isNaN(end) || start < 1 || end > totalPages || start > end) {
-                        throw new Error('Invalid page range.');
-                    }
+                    const parts = rangeStr.split('-');
+                    let start = parseInt(parts[0]) - 1;
+                    let end = parseInt(parts[1]) - 1;
                     for (let i = start; i <= end; i++) {
-                        pagesToExtract.push(i - 1); // PDF-Lib uses 0-based index
+                        if (i >= 0 && i < totalPages) indices.push(i);
                     }
                 } else {
-                    const pageNum = parseInt(rangeStr, 10);
-                    if (isNaN(pageNum) || pageNum < 1 || pageNum > totalPages) {
-                        throw new Error('Invalid page number.');
-                    }
-                    pagesToExtract.push(pageNum - 1);
+                    let pageNum = parseInt(rangeStr) - 1;
+                    if (pageNum >= 0 && pageNum < totalPages) indices.push(pageNum);
                 }
 
-                const copiedPages = await newPdf.copyPages(sourcePdf, pagesToExtract);
-                copiedPages.forEach(page => newPdf.addPage(page));
+                if (indices.length === 0) {
+                    throw new Error("Invalid page range specified.");
+                }
 
-                const newPdfBytes = await newPdf.save();
+                const copiedPages = await newPdf.copyPages(srcPdf, indices);
+                copiedPages.forEach(p => newPdf.addPage(p));
 
-                // Trigger download
-                const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+                const pdfBytes = await newPdf.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = `split-${originalFileName}`;
                 link.click();
 
-                statusMessage.textContent = 'Success! Your extracted pages have been downloaded.';
-            } catch (error) {
-                console.error(error);
-                statusMessage.textContent = error.message || 'An error occurred while splitting the file.';
+                statusMessage.textContent = 'Success! Split PDF downloaded.';
+            } catch (err) {
+                console.error(err);
+                statusMessage.textContent = `Error: ${err.message}`;
             } finally {
                 splitBtn.disabled = false;
             }

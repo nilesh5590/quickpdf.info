@@ -3,98 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merge PDF Files Online Free - QuickPDF</title>
-    <meta name="description" content="Combine multiple PDF files into one single document securely in your browser. Fast, free, and no file uploads required.">
-    <!-- Tailwind CSS for styling -->
+    <title>Merge PDF - Combine PDF Files Online | QuickPDF</title>
+    <meta name="description" content="Combine multiple PDF documents into one single file securely in your browser.">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PDF-Lib CDN for browser-based PDF manipulation -->
-    <script src="https://unpkg.com/pdf-lib@1.4.0/dist/pdf-lib.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { ilp: { red: '#EB3D3F', darkred: '#D62E30', dark: '#3E4853', light: '#F8F9FA' } }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+<body class="bg-ilp-light text-ilp-dark font-sans min-h-screen flex flex-col antialiased">
 
     <!-- Header -->
-    <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
-        <a href="index.html" class="text-xl font-bold text-blue-600">QuickPDF.info</a>
-        <nav class="space-x-4 text-sm font-medium">
-            <a href="index.html" class="hover:text-blue-600">Home</a>
-            <a href="merge.html" class="text-blue-600 font-semibold">Merge PDF</a>
-            <a href="split.html" class="hover:text-blue-600">Split PDF</a>
-        </nav>
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
+            <div class="flex items-center space-x-8">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <div class="w-9 h-9 bg-ilp-red rounded-lg flex items-center justify-center text-white font-black text-xl shadow-md">Q</div>
+                    <span class="text-xl font-bold tracking-tight text-ilp-dark">Quick<span class="text-ilp-red">PDF</span></span>
+                </a>
+                <nav class="hidden md:flex space-x-6 text-sm font-semibold text-gray-600">
+                    <a href="merge.html" class="text-ilp-red font-semibold">Merge PDF</a>
+                    <a href="split.html" class="hover:text-ilp-red transition">Split PDF</a>
+                    <a href="compress.html" class="hover:text-ilp-red transition">Compress PDF</a>
+                    <a href="sign.html" class="hover:text-ilp-red transition">Sign PDF</a>
+                    <a href="ocr.html" class="hover:text-ilp-red transition">OCR Text</a>
+                </nav>
+            </div>
+            <div>
+                <a href="index.html" class="text-sm font-semibold text-gray-500 hover:text-ilp-red transition">&larr; All Tools</a>
+            </div>
+        </div>
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-2xl mx-auto px-4 py-12 flex-grow w-full text-center">
-        <h2 class="text-3xl font-extrabold mb-2">Merge PDF Files</h2>
-        <p class="text-gray-600 mb-8">Combine PDFs in the order you want with the easiest PDF merger available.</p>
-
-        <!-- Dropzone / Upload Box -->
-        <div class="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 shadow-sm hover:border-blue-500 transition cursor-pointer" id="drop-zone">
-            <input type="file" id="file-input" multiple accept=".pdf" class="hidden">
-            <div onclick="document.getElementById('file-input').click()">
-                <svg class="w-12 h-12 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                </svg>
-                <p class="text-lg font-semibold mb-1">Click to select PDF files</p>
-                <p class="text-sm text-gray-400">or drag and drop your files here</p>
-            </div>
+    <main class="flex-grow max-w-4xl mx-auto px-4 py-12 w-full flex flex-col items-center">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-black text-ilp-dark tracking-tight mb-2">MERGE PDF FILES</h1>
+            <p class="text-gray-500 text-base">Combine PDFs in the exact order you want with absolute privacy.</p>
         </div>
 
-        <!-- File List Preview -->
-        <div id="file-list-container" class="mt-6 text-left hidden">
-            <h3 class="font-semibold text-gray-700 mb-2">Selected Files (Drag or reorder if needed):</h3>
-            <ul id="file-list" class="space-y-2"></ul>
-            
-            <button id="merge-btn" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow transition">
-                Merge PDFs Now
+        <div id="upload-box" class="w-full max-w-xl bg-white border-2 border-dashed border-gray-300 rounded-3xl p-10 shadow-sm hover:border-ilp-red transition cursor-pointer text-center group" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input" accept=".pdf" multiple class="hidden">
+            <div class="w-20 h-20 bg-red-50 text-ilp-red rounded-full flex items-center justify-center mx-auto mb-5 group-hover:scale-105 transition shadow-inner">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-ilp-dark mb-1">Select PDF files</h3>
+            <p class="text-sm text-gray-400">or drop PDFs here</p>
+            <div class="mt-6 inline-block bg-ilp-red hover:bg-ilp-darkred text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition">Select PDF Files</div>
+        </div>
+
+        <div id="file-list-container" class="hidden w-full max-w-2xl bg-white border border-gray-200 p-6 rounded-3xl shadow-sm space-y-4">
+            <h3 class="font-bold text-ilp-dark text-lg border-b pb-3">Selected Files to Merge</h3>
+            <ul id="file-list" class="space-y-2 max-h-60 overflow-y-auto"></ul>
+            <button onclick="document.getElementById('file-input').click()" class="text-sm text-ilp-red font-semibold hover:underline">+ Add more files</button>
+            <button id="merge-btn" class="w-full bg-ilp-red hover:bg-ilp-darkred text-white font-extrabold py-4 rounded-2xl shadow-lg transition tracking-wide text-lg mt-4">
+                Merge PDFs &rarr;
             </button>
         </div>
 
-        <!-- Status Message -->
-        <p id="status-message" class="mt-4 text-sm font-medium text-blue-600 hidden"></p>
+        <p id="status-message" class="mt-6 text-sm font-semibold text-ilp-red text-center hidden bg-red-50 px-4 py-2.5 rounded-xl border border-red-100"></p>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t py-4 text-center text-xs text-gray-400">
-        &copy; 2026 QuickPDF.info. 100% Client-Side Privacy Guaranteed.
+    <footer class="bg-ilp-dark text-gray-400 text-xs py-8 mt-auto border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2 text-white font-bold text-sm"><div class="w-6 h-6 bg-ilp-red rounded flex items-center justify-center text-xs">Q</div><span>QuickPDF.info</span></div>
+            <div>&copy; 2026 QuickPDF &bull; 100% Secure Client-Side Processing</div>
+        </div>
     </footer>
 
-    <!-- JavaScript Logic -->
     <script>
+        let selectedFiles = [];
         const fileInput = document.getElementById('file-input');
+        const uploadBox = document.getElementById('upload-box');
         const fileListContainer = document.getElementById('file-list-container');
         const fileList = document.getElementById('file-list');
         const mergeBtn = document.getElementById('merge-btn');
         const statusMessage = document.getElementById('status-message');
 
-        let selectedFiles = [];
-
         fileInput.addEventListener('change', (e) => {
-            const files = Array.from(e.target.files);
-            selectedFiles = selectedFiles.concat(files);
-            renderFileList();
+            for (let file of e.target.files) {
+                selectedFiles.push(file);
+            }
+            if (selectedFiles.length > 0) {
+                uploadBox.classList.add('hidden');
+                fileListContainer.classList.remove('hidden');
+                renderFileList();
+            }
         });
 
         function renderFileList() {
             fileList.innerHTML = '';
-            if (selectedFiles.length > 0) {
-                fileListContainer.classList.remove('hidden');
-                selectedFiles.forEach((file, index) => {
-                    const li = document.createElement('li');
-                    li.className = 'flex justify-between items-center bg-white border p-3 rounded-lg shadow-sm';
-                    li.innerHTML = `
-                        <span class="text-sm truncate max-w-xs font-medium">${index + 1}. ${file.name}</span>
-                        <button onclick="removeFile(${index})" class="text-red-500 hover:text-red-700 text-sm font-bold">Remove</button>
-                    `;
-                    fileList.appendChild(li);
-                });
-            } else {
-                fileListContainer.classList.add('hidden');
-            }
+            selectedFiles.forEach((file, index) => {
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100 text-sm';
+                li.innerHTML = `<span class="truncate font-medium text-gray-700">${file.name}</span> <button onclick="removeFile(${index})" class="text-red-500 hover:text-red-700 font-bold ml-2">&times;</button>`;
+                fileList.appendChild(li);
+            });
         }
 
-        window.removeFile = function(index) {
+        function removeFile(index) {
             selectedFiles.splice(index, 1);
-            renderFileList();
+            if (selectedFiles.length === 0) {
+                fileListContainer.classList.add('hidden');
+                uploadBox.classList.remove('hidden');
+            } else {
+                renderFileList();
+            }
         }
 
         mergeBtn.addEventListener('click', async () => {
@@ -102,8 +123,7 @@
                 alert('Please select at least 2 PDF files to merge.');
                 return;
             }
-
-            statusMessage.textContent = 'Merging PDFs securely in your browser...';
+            statusMessage.textContent = 'Merging PDFs... Please wait.';
             statusMessage.classList.remove('hidden');
             mergeBtn.disabled = true;
 
@@ -113,24 +133,22 @@
 
                 for (let file of selectedFiles) {
                     const arrayBuffer = await file.arrayBuffer();
-                    const pdf = await PDFDocument.load(arrayBuffer);
+                    const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
                     const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
                     copiedPages.forEach((page) => mergedPdf.addPage(page));
                 }
 
-                const mergedPdfFileBytes = await mergedPdf.save();
-                
-                // Trigger download
-                const blob = new Blob([mergedPdfFileBytes], { type: 'application/pdf' });
+                const mergedPdfBytes = await mergedPdf.save();
+                const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = 'merged-quickpdf.pdf';
+                link.download = 'merged-document.pdf';
                 link.click();
 
-                statusMessage.textContent = 'Success! Your merged PDF has been downloaded.';
-            } catch (error) {
-                console.error(error);
-                statusMessage.textContent = 'An error occurred while merging the files. Please try again.';
+                statusMessage.textContent = 'Success! Merged PDF downloaded.';
+            } catch (err) {
+                console.error(err);
+                statusMessage.textContent = `Error merging PDFs: ${err.message}`;
             } finally {
                 mergeBtn.disabled = false;
             }

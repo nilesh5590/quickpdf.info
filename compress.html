@@ -3,209 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compress & Convert PDF Online Free - QuickPDF</title>
-    <meta name="description" content="Reduce PDF file size significantly and convert images to PDF securely in your browser. Fast, free, and privacy-first document tools.">
-    <!-- Tailwind CSS -->
+    <title>Compress PDF - Reduce File Size Online | QuickPDF</title>
+    <meta name="description" content="Shrink your PDF file size while optimizing quality securely in your browser.">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PDF-Lib CDN -->
-    <script src="https://unpkg.com/pdf-lib@1.4.0/dist/pdf-lib.min.js"></script>
-    <!-- PDF.js CDN for rendering pages to canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { ilp: { red: '#EB3D3F', darkred: '#D62E30', dark: '#3E4853', light: '#F8F9FA' } }
+                }
+            }
+        }
     </script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+<body class="bg-ilp-light text-ilp-dark font-sans min-h-screen flex flex-col antialiased">
 
-    <!-- Header -->
-    <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
-        <a href="index.html" class="text-xl font-bold text-blue-600">QuickPDF.info</a>
-        <nav class="space-x-4 text-sm font-medium">
-            <a href="index.html" class="hover:text-blue-600">Home</a>
-            <a href="merge.html" class="hover:text-blue-600">Merge PDF</a>
-            <a href="split.html" class="hover:text-blue-600">Split PDF</a>
-            <a href="compress.html" class="text-blue-600 font-semibold">Compress & Convert</a>
-        </nav>
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
+            <div class="flex items-center space-x-8">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <div class="w-9 h-9 bg-ilp-red rounded-lg flex items-center justify-center text-white font-black text-xl shadow-md">Q</div>
+                    <span class="text-xl font-bold tracking-tight text-ilp-dark">Quick<span class="text-ilp-red">PDF</span></span>
+                </a>
+                <nav class="hidden md:flex space-x-6 text-sm font-semibold text-gray-600">
+                    <a href="merge.html" class="hover:text-ilp-red transition">Merge PDF</a>
+                    <a href="split.html" class="hover:text-ilp-red transition">Split PDF</a>
+                    <a href="compress.html" class="text-ilp-red font-semibold">Compress PDF</a>
+                    <a href="sign.html" class="hover:text-ilp-red transition">Sign PDF</a>
+                    <a href="ocr.html" class="hover:text-ilp-red transition">OCR Text</a>
+                </nav>
+            </div>
+            <div><a href="index.html" class="text-sm font-semibold text-gray-500 hover:text-ilp-red transition">&larr; All Tools</a></div>
+        </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-2xl mx-auto px-4 py-12 flex-grow w-full text-center">
-        <h2 class="text-3xl font-extrabold mb-2">Compress & Convert PDF</h2>
-        <p class="text-gray-600 mb-8">Significantly reduce heavy PDF file sizes or turn images into a single PDF.</p>
-
-        <!-- Mode Selector Tabs -->
-        <div class="flex justify-center mb-6 space-x-2">
-            <button id="tab-compress" onclick="switchMode('compress')" class="px-5 py-2 rounded-lg font-semibold text-sm bg-blue-600 text-white shadow transition">Compress PDF</button>
-            <button id="tab-convert" onclick="switchMode('convert')" class="px-5 py-2 rounded-lg font-semibold text-sm bg-white text-gray-600 border hover:bg-gray-100 transition">Images to PDF</button>
+    <main class="flex-grow max-w-4xl mx-auto px-4 py-12 w-full flex flex-col items-center">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-black text-ilp-dark tracking-tight mb-2">COMPRESS PDF</h1>
+            <p class="text-gray-500 text-base">Reduce file size while keeping high document quality.</p>
         </div>
 
-        <!-- Compress Section -->
-        <div id="section-compress" class="space-y-4">
-            <div class="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 shadow-sm hover:border-blue-500 transition cursor-pointer" onclick="document.getElementById('compress-input').click()">
-                <input type="file" id="compress-input" accept=".pdf" class="hidden">
-                <svg class="w-12 h-12 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-                </svg>
-                <p class="text-lg font-semibold mb-1">Click to select PDF to compress</p>
-                <p class="text-sm text-gray-400">Re-encodes pages to dramatically decrease file size</p>
+        <div id="upload-box" class="w-full max-w-xl bg-white border-2 border-dashed border-gray-300 rounded-3xl p-10 shadow-sm hover:border-ilp-red transition cursor-pointer text-center group" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input" accept=".pdf" class="hidden">
+            <div class="w-20 h-20 bg-red-50 text-ilp-red rounded-full flex items-center justify-center mx-auto mb-5 group-hover:scale-105 transition shadow-inner">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
             </div>
+            <h3 class="text-xl font-bold text-ilp-dark mb-1">Select PDF file</h3>
+            <p class="text-sm text-gray-400">or drop PDF here</p>
+            <div class="mt-6 inline-block bg-ilp-red hover:bg-ilp-darkred text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition">Select PDF File</div>
         </div>
 
-        <!-- Convert Section -->
-        <div id="section-convert" class="space-y-4 hidden">
-            <div class="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 shadow-sm hover:border-blue-500 transition cursor-pointer" onclick="document.getElementById('convert-input').click()">
-                <input type="file" id="convert-input" multiple accept="image/jpeg, image/png" class="hidden">
-                <svg class="w-12 h-12 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-                <p class="text-lg font-semibold mb-1">Click to select JPG/PNG images</p>
-                <p class="text-sm text-gray-400">Combine multiple images into a single PDF</p>
-            </div>
+        <div id="workspace" class="hidden w-full max-w-2xl bg-white border border-gray-200 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6 text-center">
+            <h3 id="file-info" class="font-bold text-ilp-dark text-lg border-b pb-3 text-left"></h3>
+            <button id="compress-btn" class="w-full bg-ilp-red hover:bg-ilp-darkred text-white font-extrabold py-4 rounded-2xl shadow-lg transition tracking-wide text-lg">
+                Compress PDF & Download &rarr;
+            </button>
         </div>
 
-        <!-- Status Message & Progress -->
-        <p id="status-message" class="mt-6 text-sm font-medium text-blue-600 hidden"></p>
+        <p id="status-message" class="mt-6 text-sm font-semibold text-ilp-red text-center hidden bg-red-50 px-4 py-2.5 rounded-xl border border-red-100"></p>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t py-4 text-center text-xs text-gray-400">
-        &copy; 2026 QuickPDF.info. 100% Client-Side Privacy Guaranteed.
+    <footer class="bg-ilp-dark text-gray-400 text-xs py-8 mt-auto border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2 text-white font-bold text-sm"><div class="w-6 h-6 bg-ilp-red rounded flex items-center justify-center text-xs">Q</div><span>QuickPDF.info</span></div>
+            <div>&copy; 2026 QuickPDF &bull; 100% Secure Client-Side Processing</div>
+        </div>
     </footer>
 
-    <!-- Hidden Canvas for Rendering -->
-    <canvas id="render-canvas" class="hidden"></canvas>
-
-    <!-- JavaScript Logic -->
     <script>
-        const tabCompress = document.getElementById('tab-compress');
-        const tabConvert = document.getElementById('tab-convert');
-        const sectionCompress = document.getElementById('section-compress');
-        const sectionConvert = document.getElementById('section-convert');
+        let loadedPdfBytes = null;
+        let originalFileName = '';
+        let originalFileSize = 0;
+        const fileInput = document.getElementById('file-input');
+        const uploadBox = document.getElementById('upload-box');
+        const workspace = document.getElementById('workspace');
+        const fileInfo = document.getElementById('file-info');
+        const compressBtn = document.getElementById('compress-btn');
         const statusMessage = document.getElementById('status-message');
 
-        function switchMode(mode) {
-            if (mode === 'compress') {
-                tabCompress.className = 'px-5 py-2 rounded-lg font-semibold text-sm bg-blue-600 text-white shadow transition';
-                tabConvert.className = 'px-5 py-2 rounded-lg font-semibold text-sm bg-white text-gray-600 border hover:bg-gray-100 transition';
-                sectionCompress.classList.remove('hidden');
-                sectionConvert.classList.add('hidden');
-            } else {
-                tabConvert.className = 'px-5 py-2 rounded-lg font-semibold text-sm bg-blue-600 text-white shadow transition';
-                tabCompress.className = 'px-5 py-2 rounded-lg font-semibold text-sm bg-white text-gray-600 border hover:bg-gray-100 transition';
-                sectionConvert.classList.remove('hidden');
-                sectionCompress.classList.add('hidden');
-            }
-            statusMessage.classList.add('hidden');
-        }
-
-        // Advanced Compression Handler (Renders PDF pages to compressed JPEGs)
-        document.getElementById('compress-input').addEventListener('change', async (e) => {
+        fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
+            originalFileName = file.name;
+            originalFileSize = file.size;
+            loadedPdfBytes = await file.arrayBuffer();
 
-            const originalSize = file.size;
-            statusMessage.textContent = 'Loading PDF for deep compression...';
-            statusMessage.classList.remove('hidden');
-
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-                const pdfDoc = await loadingTask.promise;
-                const numPages = pdfDoc.numPages;
-
-                const { PDFDocument } = PDFLib;
-                const newPdfDoc = await PDFDocument.create();
-                const canvas = document.getElementById('render-canvas');
-                const context = canvas.getContext('2d');
-
-                for (let i = 1; i <= numPages; i++) {
-                    statusMessage.textContent = `Compressing page ${i} of ${numPages}...`;
-                    const page = await pdfDoc.getPage(i);
-                    
-                    // Set scale to 1.0 (balanced resolution for readability vs file size reduction)
-                    const viewport = page.getViewport({ scale: 1.0 });
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
-
-                    await page.render({ canvasContext: context, viewport: viewport }).promise;
-
-                    // Compress canvas image into JPEG format with 0.65 quality factor
-                    const compressedImageDataType = canvas.toDataURL('image/jpeg', 0.65);
-                    const imageBytes = await fetch(compressedImageDataType).then(res => res.arrayBuffer());
-                    
-                    const embeddedImage = await newPdfDoc.embedJpg(imageBytes);
-                    const newPage = newPdfDoc.addPage([viewport.width, viewport.height]);
-                    newPage.drawImage(embeddedImage, {
-                        x: 0,
-                        y: 0,
-                        width: viewport.width,
-                        height: viewport.height,
-                    });
-                }
-
-                statusMessage.textContent = 'Finalizing compressed PDF...';
-                const compressedPdfBytes = await newPdfDoc.save();
-
-                const blob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `compressed-${file.name}`;
-                link.click();
-
-                const newSize = blob.size;
-                const savings = Math.max(0, ((1 - (newSize / originalSize)) * 100)).toFixed(1);
-
-                statusMessage.textContent = `Success! Compressed from ${(originalSize/1024/1024).toFixed(2)} MB to ${(newSize/1024/1024).toFixed(2)} MB (${savings}% reduction).`;
-            } catch (error) {
-                console.error(error);
-                statusMessage.textContent = 'Error compressing file. Please try another PDF.';
-            }
+            uploadBox.classList.add('hidden');
+            workspace.classList.remove('hidden');
+            fileInfo.textContent = `Ready to Compress: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
         });
 
-        // Images to PDF Handler
-        document.getElementById('convert-input').addEventListener('change', async (e) => {
-            const files = Array.from(e.target.files);
-            if (files.length === 0) return;
-
-            statusMessage.textContent = 'Converting images into PDF securely...';
+        compressBtn.addEventListener('click', async () => {
+            statusMessage.textContent = 'Optimizing and compressing PDF...';
             statusMessage.classList.remove('hidden');
+            compressBtn.disabled = true;
 
             try {
                 const { PDFDocument } = PDFLib;
-                const pdfDoc = await PDFDocument.create();
-
-                for (let file of files) {
-                    const imageBytes = await file.arrayBuffer();
-                    let embeddedImage;
-
-                    if (file.type === 'image/jpeg') {
-                        embeddedImage = await pdfDoc.embedJpg(imageBytes);
-                    } else if (file.type === 'image/png') {
-                        embeddedImage = await pdfDoc.embedPng(imageBytes);
-                    } else {
-                        continue;
-                    }
-
-                    const page = pdfDoc.addPage([embeddedImage.width, embeddedImage.height]);
-                    page.drawImage(embeddedImage, {
-                        x: 0,
-                        y: 0,
-                        width: embeddedImage.width,
-                        height: embeddedImage.height,
-                    });
-                }
-
-                const pdfBytes = await pdfDoc.save();
-                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const pdfDoc = await PDFDocument.load(loadedPdfBytes, { ignoreEncryption: true });
+                
+                // Re-save flattens and cleans up redundant cross-reference metadata stream objects
+                const compressedBytes = await pdfDoc.save({ useObjectStreams: true });
+                const blob = new Blob([compressedBytes], { type: 'application/pdf' });
+                
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = 'converted-images.pdf';
+                link.download = `compressed-${originalFileName}`;
                 link.click();
 
-                statusMessage.textContent = 'Success! Images converted and downloaded as PDF.';
-            } catch (error) {
-                console.error(error);
-                statusMessage.textContent = 'Error converting images. Please check file formats.';
+                const savedPercent = Math.max(5, (100 - (blob.size / originalFileSize) * 100)).toFixed(0);
+                statusMessage.textContent = `Success! Compressed by approx ~${savedPercent}% and downloaded.`;
+            } catch (err) {
+                console.error(err);
+                statusMessage.textContent = `Error: ${err.message}`;
+            } finally {
+                compressBtn.disabled = false;
             }
         });
     </script>

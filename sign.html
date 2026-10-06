@@ -3,10 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign PDF Online Free - QuickPDF</title>
-    <meta name="description" content="Draw or upload your signature, place it anywhere on your PDF document, and sign securely in your browser.">
+    <title>Sign PDF - Online Document Signer | QuickPDF</title>
+    <meta name="description" content="Sign PDF documents online with your drawn or uploaded signature. 100% free and secure client-side signing.">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ilp: { red: '#EB3D3F', darkred: '#D62E30', dark: '#3E4853', light: '#F8F9FA' }
+                    }
+                }
+            }
+        }
+    </script>
     <!-- Robust PDF-Lib CDN v1.17.1 -->
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <!-- PDF.js CDN for rendering pages for interactive placement -->
@@ -15,101 +26,130 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+<body class="bg-ilp-light text-ilp-dark font-sans min-h-screen flex flex-col antialiased selection:bg-ilp-red selection:text-white">
 
     <!-- Header -->
-    <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
-        <a href="index.html" class="text-xl font-bold text-blue-600">QuickPDF.info</a>
-        <nav class="space-x-4 text-sm font-medium">
-            <a href="index.html" class="hover:text-blue-600">Home</a>
-            <a href="merge.html" class="hover:text-blue-600">Merge PDF</a>
-            <a href="split.html" class="hover:text-blue-600">Split PDF</a>
-            <a href="compress.html" class="hover:text-blue-600">Compress</a>
-            <a href="sign.html" class="text-blue-600 font-semibold">Sign PDF</a>
-            <a href="ocr.html" class="hover:text-blue-600">OCR Text</a>
-        </nav>
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
+            <div class="flex items-center space-x-8">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <div class="w-9 h-9 bg-ilp-red rounded-lg flex items-center justify-center text-white font-black text-xl shadow-md">Q</div>
+                    <span class="text-xl font-bold tracking-tight text-ilp-dark">Quick<span class="text-ilp-red">PDF</span></span>
+                </a>
+                <nav class="hidden md:flex space-x-6 text-sm font-semibold text-gray-600">
+                    <a href="merge.html" class="hover:text-ilp-red transition">Merge PDF</a>
+                    <a href="split.html" class="hover:text-ilp-red transition">Split PDF</a>
+                    <a href="compress.html" class="hover:text-ilp-red transition">Compress PDF</a>
+                    <a href="sign.html" class="text-ilp-red transition font-semibold">Sign PDF</a>
+                    <a href="ocr.html" class="hover:text-ilp-red transition">OCR Text</a>
+                </nav>
+            </div>
+            <div>
+                <a href="index.html" class="text-sm font-semibold text-gray-500 hover:text-ilp-red transition">&larr; All Tools</a>
+            </div>
+        </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-3xl mx-auto px-4 py-12 flex-grow w-full">
-        <h2 class="text-3xl font-extrabold mb-2 text-center">Sign PDF Document</h2>
-        <p class="text-gray-600 mb-8 text-center">Upload a PDF, draw or upload your signature, position it anywhere, and download.</p>
-
-        <!-- Step 1: Upload PDF Box -->
-        <div id="upload-box" class="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 shadow-sm hover:border-blue-500 transition cursor-pointer text-center" onclick="document.getElementById('file-input').click()">
-            <input type="file" id="file-input" accept=".pdf" class="hidden">
-            <svg class="w-12 h-12 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-            </svg>
-            <p class="text-lg font-semibold mb-1">Click to select a PDF to sign</p>
-            <p class="text-sm text-gray-400">Secure client-side processing</p>
+    <!-- Main Tool Container -->
+    <main class="flex-grow max-w-5xl mx-auto px-4 sm:px-6 py-12 w-full flex flex-col items-center">
+        
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-black text-ilp-dark tracking-tight mb-2">SIGN PDF DOCUMENT</h1>
+            <p class="text-gray-500 text-base max-w-xl mx-auto">Add your electronic signature to documents easily, securely, and without downloading software.</p>
         </div>
 
-        <!-- Step 2: Workspace (Hidden Initially) -->
-        <div id="workspace" class="hidden space-y-6">
+        <!-- Step 1: Upload Box -->
+        <div id="upload-box" class="w-full max-w-2xl bg-white border-2 border-dashed border-gray-300 rounded-3xl p-10 shadow-sm hover:border-ilp-red transition-all duration-300 cursor-pointer text-center group" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input" accept=".pdf" class="hidden">
+            <div class="w-20 h-20 bg-red-50 text-ilp-red rounded-full flex items-center justify-center mx-auto mb-5 group-hover:scale-105 transition transform shadow-inner">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-ilp-dark mb-1">Select PDF file</h3>
+            <p class="text-sm text-gray-400">or drop PDF here</p>
+            <div class="mt-6 inline-block bg-ilp-red hover:bg-ilp-darkred text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition tracking-wide text-sm">
+                Select PDF File
+            </div>
+        </div>
+
+        <!-- Step 2: Workspace -->
+        <div id="workspace" class="hidden w-full max-w-3xl space-y-8">
             
-            <!-- Signature Creator / Selector Box -->
-            <div class="bg-white border p-6 rounded-xl shadow-sm space-y-4">
-                <h3 class="font-bold text-gray-800 text-lg">1. Create or Upload Your Signature</h3>
+            <div class="bg-white border border-gray-200 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6">
+                <div class="flex items-center space-x-3 border-b border-gray-100 pb-4">
+                    <div class="w-8 h-8 rounded-full bg-ilp-red text-white flex items-center justify-center font-bold text-sm">1</div>
+                    <h3 class="font-bold text-ilp-dark text-lg">Create or Upload Your Signature</h3>
+                </div>
                 
-                <div class="flex space-x-4 border-b pb-2">
-                    <button onclick="switchSigTab('draw')" id="tab-draw" class="font-semibold text-sm text-blue-600 pb-1 border-b-2 border-blue-600">Draw Signature</button>
-                    <button onclick="switchSigTab('upload')" id="tab-upload" class="font-semibold text-sm text-gray-500 pb-1">Upload Signature Image</button>
+                <div class="flex space-x-6 border-b border-gray-200 pb-2">
+                    <button onclick="switchSigTab('draw')" id="tab-draw" class="font-bold text-sm text-ilp-red pb-2 border-b-2 border-ilp-red transition">Draw Signature</button>
+                    <button onclick="switchSigTab('upload')" id="tab-upload" class="font-semibold text-sm text-gray-400 pb-2 border-b-2 border-transparent hover:text-gray-600 transition">Upload Image</button>
                 </div>
 
-                <!-- Draw Panel -->
-                <div id="panel-draw" class="space-y-3">
-                    <div class="border-2 border-gray-300 rounded-lg bg-gray-50 overflow-hidden inline-block">
-                        <canvas id="sig-canvas" width="400" height="130" class="cursor-crosshair touch-none"></canvas>
+                <div id="panel-draw" class="space-y-4">
+                    <div class="border-2 border-gray-200 rounded-2xl bg-gray-50 overflow-hidden inline-block shadow-inner">
+                        <canvas id="sig-canvas" width="450" height="150" class="cursor-crosshair touch-none bg-white"></canvas>
                     </div>
                     <div>
-                        <button onclick="clearCanvas()" class="text-xs text-red-500 hover:text-red-700 font-semibold">Clear Drawing</button>
+                        <button onclick="clearCanvas()" class="text-xs text-red-500 hover:text-red-700 font-bold uppercase tracking-wider flex items-center space-x-1"><span>&#x21BA; Clear Signature</span></button>
                     </div>
                 </div>
 
-                <!-- Upload Panel -->
-                <div id="panel-upload" class="space-y-3 hidden">
-                    <input type="file" id="sig-img-input" accept="image/png, image/jpeg" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-                    <p class="text-xs text-gray-400">Upload a transparent PNG or clear JPEG scan of your signature.</p>
+                <div id="panel-upload" class="space-y-4 hidden">
+                    <input type="file" id="sig-img-input" accept="image/png, image/jpeg" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-ilp-red hover:file:bg-red-100 cursor-pointer">
+                    <p class="text-xs text-gray-400">Supports transparent PNG or clear JPEG scan files.</p>
                 </div>
 
-                <button onclick="applySignatureToPreview()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow transition">
+                <button onclick="applySignatureToPreview()" class="w-full bg-ilp-red hover:bg-ilp-darkred text-white font-bold py-4 rounded-xl shadow-md hover:shadow-lg transition tracking-wide">
                     Apply Signature to Document &rarr;
                 </button>
             </div>
 
-            <!-- Step 3: Interactive Positioning Workspace -->
-            <div id="position-container" class="bg-white border p-6 rounded-xl shadow-sm hidden space-y-4 text-center">
-                <h3 class="font-bold text-gray-800 text-lg text-left">2. Position & Confirm Signature</h3>
-                <p class="text-sm text-gray-500 text-left">Click and drag your signature anywhere on the page preview below, then click save.</p>
+            <div id="position-container" class="bg-white border border-gray-200 p-6 sm:p-8 rounded-3xl shadow-sm hidden space-y-6 text-center">
+                <div class="flex items-center space-x-3 border-b border-gray-100 pb-4 text-left">
+                    <div class="w-8 h-8 rounded-full bg-ilp-red text-white flex items-center justify-center font-bold text-sm">2</div>
+                    <div>
+                        <h3 class="font-bold text-ilp-dark text-lg">Position Your Signature</h3>
+                        <p class="text-xs text-gray-500">Drag and drop the signature box anywhere on the document preview below.</p>
+                    </div>
+                </div>
                 
-                <!-- Interactive Canvas Container -->
-                <div class="relative inline-block border-2 border-gray-300 shadow-inner overflow-hidden bg-gray-100 mx-auto" id="preview-wrapper">
+                <div class="relative inline-block border-2 border-gray-200 rounded-xl shadow-md overflow-hidden bg-gray-100 mx-auto" id="preview-wrapper">
                     <canvas id="pdf-canvas" class="block"></canvas>
-                    <!-- Movable Signature Box -->
-                    <div id="draggable-sig" class="absolute border-2 border-dashed border-blue-600 bg-blue-500/10 cursor-move hidden flex items-center justify-center select-none" style="width: 150px; height: 55px; left: 50px; top: 50px;">
-                        <img id="sig-preview-img" class="max-h-full max-w-full pointer-events-none" alt="Signature">
-                        <span class="absolute -top-3 left-0 bg-blue-600 text-white text-[10px] px-1 rounded">Drag Me</span>
+                    <div id="draggable-sig" class="absolute border-2 border-dashed border-ilp-red bg-ilp-red/10 cursor-move hidden flex items-center justify-center select-none shadow-lg rounded-md" style="width: 150px; height: 55px; left: 50px; top: 50px;">
+                        <img id="sig-preview-img" class="max-h-full max-w-full pointer-events-none object-contain" alt="Signature">
+                        <span class="absolute -top-3.5 left-0 bg-ilp-red text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">Drag to move</span>
                     </div>
                 </div>
 
                 <div>
-                    <button id="confirm-download-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow transition">
-                        Confirm & Download Signed PDF
+                    <button id="confirm-download-btn" class="w-full bg-ilp-red hover:bg-ilp-darkred text-white font-extrabold py-4 rounded-2xl shadow-lg hover:shadow-xl transition tracking-wide text-lg flex items-center justify-center space-x-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <span>Download Signed PDF</span>
                     </button>
                 </div>
             </div>
 
         </div>
 
-        <p id="status-message" class="mt-4 text-sm font-medium text-blue-600 text-center hidden"></p>
+        <p id="status-message" class="mt-6 text-sm font-semibold text-ilp-red text-center hidden bg-red-50 px-4 py-2.5 rounded-xl border border-red-100 max-w-md"></p>
     </main>
 
-    <footer class="bg-white border-t py-4 text-center text-xs text-gray-400">
-        &copy; 2026 QuickPDF.info. 100% Client-Side Privacy Guaranteed.
+    <!-- Footer -->
+    <footer class="bg-ilp-dark text-gray-400 text-xs py-8 mt-auto border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+            <div class="flex items-center space-x-2 text-white font-bold text-sm">
+                <div class="w-6 h-6 bg-ilp-red rounded flex items-center justify-center text-xs">Q</div>
+                <span>QuickPDF.info</span>
+            </div>
+            <div>&copy; 2026 QuickPDF &bull; 100% Secure Client-Side Privacy Guaranteed</div>
+            <div class="flex space-x-6 text-gray-400">
+                <a href="index.html" class="hover:text-white transition">Home</a>
+                <a href="merge.html" class="hover:text-white transition">Merge</a>
+                <a href="sign.html" class="hover:text-white transition">Sign</a>
+            </div>
+        </div>
     </footer>
 
-    <!-- Signing Logic -->
     <script>
         const fileInput = document.getElementById('file-input');
         const uploadBox = document.getElementById('upload-box');
@@ -133,7 +173,7 @@
         let pdfDocProxy = null;
         let viewportScale = 1.0;
 
-        ctx.strokeStyle = '#000000';
+        ctx.strokeStyle = '#1a1a1a';
         ctx.lineWidth = 2.5;
         ctx.lineCap = 'round';
 
@@ -162,13 +202,13 @@
             if (mode === 'draw') {
                 document.getElementById('panel-draw').classList.remove('hidden');
                 document.getElementById('panel-upload').classList.add('hidden');
-                document.getElementById('tab-draw').className = 'font-semibold text-sm text-blue-600 pb-1 border-b-2 border-blue-600';
-                document.getElementById('tab-upload').className = 'font-semibold text-sm text-gray-500 pb-1';
+                document.getElementById('tab-draw').className = 'font-bold text-sm text-ilp-red pb-2 border-b-2 border-ilp-red transition';
+                document.getElementById('tab-upload').className = 'font-semibold text-sm text-gray-400 pb-2 border-b-2 border-transparent hover:text-gray-600 transition';
             } else {
                 document.getElementById('panel-upload').classList.remove('hidden');
                 document.getElementById('panel-draw').classList.add('hidden');
-                document.getElementById('tab-upload').className = 'font-semibold text-sm text-blue-600 pb-1 border-b-2 border-blue-600';
-                document.getElementById('tab-draw').className = 'font-semibold text-sm text-gray-500 pb-1';
+                document.getElementById('tab-upload').className = 'font-bold text-sm text-ilp-red pb-2 border-b-2 border-ilp-red transition';
+                document.getElementById('tab-draw').className = 'font-semibold text-sm text-gray-400 pb-2 border-b-2 border-transparent hover:text-gray-600 transition';
             }
         }
 
@@ -180,8 +220,6 @@
             const reader = new FileReader();
             reader.onload = async function(event) {
                 const rawBuffer = event.target.result;
-                
-                // Store a deep copy using Uint8Array to avoid reference locking or buffer detachment issues
                 loadedPdfBytes = new Uint8Array(rawBuffer);
 
                 uploadBox.classList.add('hidden');
@@ -243,7 +281,6 @@
             positionContainer.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Dragging Logic
         let isDragging = false;
         let startX, startY;
 
@@ -313,8 +350,6 @@
 
             try {
                 const { PDFDocument } = PDFLib;
-                
-                // Load PDF Document with standard options fallback
                 const pdfDoc = await PDFDocument.load(loadedPdfBytes, { ignoreEncryption: true });
                 const pages = pdfDoc.getPages();
                 

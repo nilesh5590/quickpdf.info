@@ -3,91 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OCR PDF & Image Text Extractor - QuickPDF</title>
-    <meta name="description" content="Extract searchable text from scanned PDFs and images instantly inside your web browser using free client-side OCR.">
+    <title>OCR Text Extraction - Read Text from PDF | QuickPDF</title>
+    <meta name="description" content="Extract selectable text from scanned PDF documents and images securely in your browser.">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tesseract.js CDN for Browser OCR -->
-    <script src="https://unpkg.com/tesseract.js@v5.0.5/dist/tesseract.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { ilp: { red: '#EB3D3F', darkred: '#D62E30', dark: '#3E4853', light: '#F8F9FA' } }
+                }
+            }
+        }
+    </script>
+    <!-- Tesseract.js CDN for reliable OCR text recognition -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+<body class="bg-ilp-light text-ilp-dark font-sans min-h-screen flex flex-col antialiased">
 
-    <!-- Header -->
-    <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
-        <a href="index.html" class="text-xl font-bold text-blue-600">QuickPDF.info</a>
-        <nav class="space-x-4 text-sm font-medium">
-            <a href="index.html" class="hover:text-blue-600">Home</a>
-            <a href="merge.html" class="hover:text-blue-600">Merge PDF</a>
-            <a href="split.html" class="hover:text-blue-600">Split PDF</a>
-            <a href="compress.html" class="hover:text-blue-600">Compress</a>
-            <a href="sign.html" class="hover:text-blue-600">Sign PDF</a>
-            <a href="ocr.html" class="text-blue-600 font-semibold">OCR Text</a>
-        </nav>
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
+            <div class="flex items-center space-x-8">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <div class="w-9 h-9 bg-ilp-red rounded-lg flex items-center justify-center text-white font-black text-xl shadow-md">Q</div>
+                    <span class="text-xl font-bold tracking-tight text-ilp-dark">Quick<span class="text-ilp-red">PDF</span></span>
+                </a>
+                <nav class="hidden md:flex space-x-6 text-sm font-semibold text-gray-600">
+                    <a href="merge.html" class="hover:text-ilp-red transition">Merge PDF</a>
+                    <a href="split.html" class="hover:text-ilp-red transition">Split PDF</a>
+                    <a href="compress.html" class="hover:text-ilp-red transition">Compress PDF</a>
+                    <a href="sign.html" class="hover:text-ilp-red transition">Sign PDF</a>
+                    <a href="ocr.html" class="text-ilp-red font-semibold">OCR Text</a>
+                </nav>
+            </div>
+            <div><a href="index.html" class="text-sm font-semibold text-gray-500 hover:text-ilp-red transition">&larr; All Tools</a></div>
+        </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-2xl mx-auto px-4 py-12 flex-grow w-full">
-        <h2 class="text-3xl font-extrabold mb-2 text-center">OCR Text Extractor</h2>
-        <p class="text-gray-600 mb-8 text-center">Extract text from scanned documents or images instantly in your browser.</p>
-
-        <!-- Upload Box -->
-        <div class="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 shadow-sm hover:border-blue-500 transition cursor-pointer text-center" onclick="document.getElementById('file-input').click()">
-            <input type="file" id="file-input" accept="image/*,.pdf" class="hidden">
-            <svg class="w-12 h-12 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-            <p class="text-lg font-semibold mb-1">Click to select an image or scanned document</p>
-            <p class="text-sm text-gray-400">Supports PNG, JPG, and PDF formats</p>
+    <main class="flex-grow max-w-4xl mx-auto px-4 py-12 w-full flex flex-col items-center">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-black text-ilp-dark tracking-tight mb-2">OCR TEXT EXTRACTION</h1>
+            <p class="text-gray-500 text-base">Extract readable text from scanned PDF pages or document images.</p>
         </div>
 
-        <!-- Status & Results -->
-        <div id="result-container" class="mt-6 bg-white border p-6 rounded-xl shadow-sm hidden space-y-4">
-            <h3 id="status-text" class="font-bold text-blue-600 text-sm">Processing OCR...</h3>
-            <textarea id="output-text" rows="8" class="w-full border rounded-lg p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Extracted text will appear here..."></textarea>
-            <button onclick="copyText()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow transition">
-                Copy Extracted Text
+        <div id="upload-box" class="w-full max-w-xl bg-white border-2 border-dashed border-gray-300 rounded-3xl p-10 shadow-sm hover:border-ilp-red transition cursor-pointer text-center group" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input" accept="image/*,.pdf" class="hidden">
+            <div class="w-20 h-20 bg-red-50 text-ilp-red rounded-full flex items-center justify-center mx-auto mb-5 group-hover:scale-105 transition shadow-inner">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-ilp-dark mb-1">Select Document or Image</h3>
+            <p class="text-sm text-gray-400">or drop file here</p>
+            <div class="mt-6 inline-block bg-ilp-red hover:bg-ilp-darkred text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition">Select File</div>
+        </div>
+
+        <div id="workspace" class="hidden w-full max-w-2xl bg-white border border-gray-200 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6">
+            <h3 id="file-info" class="font-bold text-ilp-dark text-lg border-b pb-3"></h3>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Extracted Text Result</label>
+                <textarea id="ocr-result" rows="8" readonly class="w-full border border-gray-300 rounded-xl p-4 text-sm font-mono bg-gray-50 focus:outline-none"></textarea>
+            </div>
+            <button id="copy-btn" class="w-full bg-ilp-red hover:bg-ilp-darkred text-white font-extrabold py-4 rounded-2xl shadow-lg transition tracking-wide text-lg">
+                Copy Extracted Text to Clipboard
             </button>
         </div>
+
+        <p id="status-message" class="mt-6 text-sm font-semibold text-ilp-red text-center hidden bg-red-50 px-4 py-2.5 rounded-xl border border-red-100"></p>
     </main>
 
-    <footer class="bg-white border-t py-4 text-center text-xs text-gray-400">
-        &copy; 2026 QuickPDF.info. 100% Client-Side Privacy Guaranteed.
+    <footer class="bg-ilp-dark text-gray-400 text-xs py-8 mt-auto border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2 text-white font-bold text-sm"><div class="w-6 h-6 bg-ilp-red rounded flex items-center justify-center text-xs">Q</div><span>QuickPDF.info</span></div>
+            <div>&copy; 2026 QuickPDF &bull; 100% Secure Client-Side Processing</div>
+        </div>
     </footer>
 
-    <!-- OCR Logic -->
     <script>
         const fileInput = document.getElementById('file-input');
-        const resultContainer = document.getElementById('result-container');
-        const statusText = document.getElementById('status-text');
-        const outputText = document.getElementById('output-text');
+        const uploadBox = document.getElementById('upload-box');
+        const workspace = document.getElementById('workspace');
+        const fileInfo = document.getElementById('file-info');
+        const ocrResult = document.getElementById('ocr-result');
+        const copyBtn = document.getElementById('copy-btn');
+        const statusMessage = document.getElementById('status-message');
 
         fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            resultContainer.classList.remove('hidden');
-            statusText.textContent = 'Initializing local OCR engine (Tesseract.js)...';
-            outputText.value = '';
+            uploadBox.classList.add('hidden');
+            workspace.classList.remove('hidden');
+            fileInfo.textContent = `Processing OCR for: ${file.name}`;
+            statusMessage.textContent = 'Running OCR text recognition... Please wait.';
+            statusMessage.classList.remove('hidden');
 
             try {
                 const worker = await Tesseract.createWorker('eng');
-                statusText.textContent = 'Recognizing text from document... Please wait.';
-                
                 const ret = await worker.recognize(file);
-                outputText.value = ret.data.text;
-                statusText.textContent = 'Success! Text extracted successfully.';
-                
                 await worker.terminate();
-            } catch (error) {
-                console.error(error);
-                statusText.textContent = 'Error processing OCR. Please try another file.';
+
+                ocrResult.value = ret.data.text || 'No text could be extracted from this file.';
+                statusMessage.textContent = 'Success! Text extracted successfully.';
+            } catch (err) {
+                console.error(err);
+                statusMessage.textContent = `OCR Error: ${err.message}`;
             }
         });
 
-        window.copyText = function() {
-            outputText.select();
-            document.execCommand('copy');
-            alert('Extracted text copied to clipboard!');
-        }
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(ocrResult.value);
+            copyBtn.textContent = 'Copied to Clipboard! ✓';
+            setTimeout(() => { copyBtn.textContent = 'Copy Extracted Text to Clipboard'; }, 2500);
+        });
     </script>
 </body>
 </html>
