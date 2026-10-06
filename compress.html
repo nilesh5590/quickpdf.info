@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compress & Convert PDF Online Free - QuickPDF</title>
+    <meta name="description" content="Reduce PDF file size and convert images to PDF securely in your browser. Fast, free, and privacy-first document tools.">
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PDF-Lib CDN for browser-based PDF manipulation -->
+    <script src="https://unpkg.com/pdf-lib@1.4.0/dist/pdf-lib.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
+        <a href="index.html" class="text-xl font-bold text-blue-600">QuickPDF.info</a>
+        <nav class="space-x-4 text-sm font-medium">
+            <a href="index.html" class="hover:text-blue-600">Home</a>
+            <a href="merge.html" class="hover:text-blue-600">Merge PDF</a>
+            <a href="split.html" class="hover:text-blue-600">Split PDF</a>
+            <a href="compress.html" class="text-blue-600 font-semibold">Compress & Convert</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-2xl mx-auto px-4 py-12 flex-grow w-full text-center">
+        <h2 class="text-3xl font-extrabold mb-2">Compress & Convert PDF</h2>
+        <p class="text-gray-600 mb-8">Optimize PDF sizes or convert images (JPG/PNG) into a single PDF instantly.</p>
+
+        <!-- Mode Selector Tabs -->
+        <div class="flex justify-center mb-6 space-x-2">
+            <button id="tab-compress" onclick="switchMode('compress')" class="px-5 py-2 rounded-lg font-semibold text-sm bg-blue-600 text-white shadow transition">Compress PDF</button>
+            <button id="tab-convert" onclick="switchMode('convert')" class="px-5 py-2 rounded-lg font-semibold text-sm bg-white text-gray-600 border hover:bg-gray-100 transition">Images to PDF</button>
+        </div>
+
+        <!-- Compress Section -->
+        <div id="section-compress" class="space-y-4">
+            <div class="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 shadow-sm hover:border-blue-500 transition cursor-pointer" onclick="document.getElementById('compress-input').click()">
+                <input type="file" id="compress-input" accept=".pdf" class="hidden">
+                <svg class="w-12 h-12 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                </svg>
+                <p class="text-lg font-semibold mb-1">Click to select PDF to optimize</p>
+                <p class="text-sm text-gray-400">Restructures document metadata and objects for a leaner file</p>
+            </div>
+        </div>
+
+        <!-- Convert Section (Hidden by default) -->
+        <div id="section-convert" class="space-y-4 hidden">
+            <div class="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 shadow-sm hover:border-blue-500 transition cursor-pointer" onclick="document.getElementById('convert-input').click()">
+                <input type="file" id="convert-input" multiple accept="image/jpeg, image/png" class="hidden">
+                <svg class="w-12 h-12 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <p class="text-lg font-semibold mb-1">Click to select JPG/PNG images</p>
+                <p class="text-sm text-gray-400">Select multiple images to combine them into a single PDF</p>
+            </div>
+        </div>
+
+        <!-- Status Message -->
+        <p id="status-message" class="mt-6 text-sm font-medium text-blue-600 hidden"></p>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t py-4 text-center text-xs text-gray-400">
+        &copy; 2026 QuickPDF.info. 100% Client-Side Privacy Guaranteed.
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const tabCompress = document.getElementById('tab-compress');
+        const tabConvert = document.getElementById('tab-convert');
+        const sectionCompress = document.getElementById('section-compress');
+        const sectionConvert = document.getElementById('section-convert');
+        const statusMessage = document.getElementById('status-message');
+
+        function switchMode(mode) {
+            if (mode === 'compress') {
+                tabCompress.className = 'px-5 py-2 rounded-lg font-semibold text-sm bg-blue-600 text-white shadow transition';
+                tabConvert.className = 'px-5 py-2 rounded-lg font-semibold text-sm bg-white text-gray-600 border hover:bg-gray-100 transition';
+                sectionCompress.classList.remove('hidden');
+                sectionConvert.classList.add('hidden');
+            } else {
+                tabConvert.className = 'px-5 py-2 rounded-lg font-semibold text-sm bg-blue-600 text-white shadow transition';
+                tabCompress.className = 'px-5 py-2 rounded-lg font-semibold text-sm bg-white text-gray-600 border hover:bg-gray-100 transition';
+                sectionConvert.classList.remove('hidden');
+                sectionCompress.classList.add('hidden');
+            }
+            statusMessage.classList.add('hidden');
+        }
+
+        // Compress Handler
+        document.getElementById('compress-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            statusMessage.textContent = 'Optimizing and cleaning PDF structure locally...';
+            statusMessage.classList.remove('hidden');
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const { PDFDocument } = PDFLib;
+                const pdfDoc = await PDFDocument.load(arrayBuffer);
+                
+                // Save with object compression enabled
+                const compressedPdfBytes = await pdfDoc.save({ useObjectStreams: true });
+
+                const blob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `optimized-${file.name}`;
+                link.click();
+
+                statusMessage.textContent = `Success! Optimized file downloaded (Original: ${(file.size/1024).toFixed(1)} KB).`;
+            } catch (error) {
+                console.error(error);
+                statusMessage.textContent = 'Error compressing file. Please try a different PDF.';
+            }
+        });
+
+        // Images to PDF Handler
+        document.getElementById('convert-input').addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            statusMessage.textContent = 'Converting images into PDF securely...';
+            statusMessage.classList.remove('hidden');
+
+            try {
+                const { PDFDocument } = PDFLib;
+                const pdfDoc = await PDFDocument.create();
+
+                for (let file of files) {
+                    const imageBytes = await file.arrayBuffer();
+                    let embeddedImage;
+
+                    if (file.type === 'image/jpeg') {
+                        embeddedImage = await pdfDoc.embedJpg(imageBytes);
+                    } else if (file.type === 'image/png') {
+                        embeddedImage = await pdfDoc.embedPng(imageBytes);
+                    } else {
+                        continue; // Skip unsupported formats
+                    }
+
+                    const page = pdfDoc.addPage([embeddedImage.width, embeddedImage.height]);
+                    page.drawImage(embeddedImage, {
+                        x: 0,
+                        y: 0,
+                        width: embeddedImage.width,
+                        height: embeddedImage.height,
+                    });
+                }
+
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'converted-images.pdf';
+                link.click();
+
+                statusMessage.textContent = 'Success! Images converted and downloaded as PDF.';
+            } catch (error) {
+                console.error(error);
+                statusMessage.textContent = 'Error converting images. Please check file formats.';
+            }
+        });
+    </script>
+</body>
+</html>
