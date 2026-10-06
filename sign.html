@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign PDF Online Free - QuickPDF</title>
+    <meta name="description" content="Add a legally binding electronic signature to your PDF documents securely inside your web browser. No uploads required.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/pdf-lib@1.4.0/dist/pdf-lib.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
+        <a href="index.html" class="text-xl font-bold text-blue-600">QuickPDF.info</a>
+        <nav class="space-x-4 text-sm font-medium">
+            <a href="index.html" class="hover:text-blue-600">Home</a>
+            <a href="merge.html" class="hover:text-blue-600">Merge PDF</a>
+            <a href="split.html" class="hover:text-blue-600">Split PDF</a>
+            <a href="compress.html" class="hover:text-blue-600">Compress</a>
+            <a href="sign.html" class="text-blue-600 font-semibold">Sign PDF</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-2xl mx-auto px-4 py-12 flex-grow w-full">
+        <h2 class="text-3xl font-extrabold mb-2 text-center">Sign PDF Document</h2>
+        <p class="text-gray-600 mb-8 text-center">Draw your signature and stamp it securely onto your PDF.</p>
+
+        <!-- Upload Box -->
+        <div id="upload-box" class="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 shadow-sm hover:border-blue-500 transition cursor-pointer text-center" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input" accept=".pdf" class="hidden">
+            <svg class="w-12 h-12 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+            </svg>
+            <p class="text-lg font-semibold mb-1">Click to select a PDF to sign</p>
+            <p class="text-sm text-gray-400">PDF will be processed entirely on your device</p>
+        </div>
+
+        <!-- Signing Workspace (Hidden Initially) -->
+        <div id="sign-workspace" class="bg-white border p-6 rounded-xl shadow-sm hidden space-y-6">
+            <div>
+                <h3 id="file-name" class="font-bold text-gray-800"></h3>
+                <p class="text-sm text-gray-500">Draw your signature in the box below:</p>
+            </div>
+
+            <!-- Signature Canvas -->
+            <div class="border-2 border-gray-300 rounded-lg bg-gray-50 overflow-hidden relative">
+                <canvas id="sig-canvas" width="550" height="180" class="w-full cursor-crosshair touch-none"></canvas>
+            </div>
+            
+            <div class="flex justify-between">
+                <button onclick="clearSignature()" class="text-sm text-red-500 hover:text-red-700 font-medium">Clear Signature</button>
+                <button id="sign-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg shadow transition">
+                    Stamp & Download Signed PDF
+                </button>
+            </div>
+        </div>
+
+        <p id="status-message" class="mt-4 text-sm font-medium text-blue-600 text-center hidden"></p>
+    </main>
+
+    <footer class="bg-white border-t py-4 text-center text-xs text-gray-400">
+        &copy; 2026 QuickPDF.info. 100% Client-Side Privacy Guaranteed.
+    </footer>
+
+    <!-- Signing Logic -->
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const uploadBox = document.getElementById('upload-box');
+        const signWorkspace = document.getElementById('sign-workspace');
+        const fileNameEl = document.getElementById('file-name');
+        const statusMessage = document.getElementById('status-message');
+        const signBtn = document.getElementById('sign-btn');
+        
+        const canvas = document.getElementById('sig-canvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        let loadedPdfBytes = null;
+        let originalFileName = '';
+
+        // Canvas Drawing Setup
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+
+        function startDrawing(e) {
+            drawing = true;
+            draw(e);
+        }
+        function stopDrawing() {
+            drawing = false;
+            ctx.beginPath();
+        }
+        function draw(e) {
+            if (!drawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        window.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDrawing);
+
+        window.clearSignature = function() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            originalFileName = file.name;
+            fileNameEl.textContent = `File: ${file.name}`;
+            loadedPdfBytes = await file.arrayBuffer();
+            uploadBox.classList.add('hidden');
+            signWorkspace.classList.remove('hidden');
+        });
+
+        signBtn.addEventListener('click', async () => {
+            statusMessage.textContent = 'Applying signature securely...';
+            statusMessage.classList.remove('hidden');
+            signBtn.disabled = true;
+
+            try {
+                const { PDFDocument } = PDFLib;
+                const pdfDoc = await PDFDocument.load(loadedPdfBytes);
+                
+                // Convert signature canvas to PNG image bytes
+                const sigDataUrl = canvas.toDataURL('image/png');
+                const sigImageBytes = await fetch(sigDataUrl).then(res => res.arrayBuffer());
+                const sigImage = await pdfDoc.embedPng(sigImageBytes);
+
+                // Add signature to the first page bottom right
+                const pages = pdfDoc.getPages();
+                const firstPage = pages[0];
+                const { width, height } = firstPage.getSize();
+
+                firstPage.drawImage(sigImage, {
+                    x: width - 200,
+                    y: 50,
+                    width: 150,
+                    height: 50,
+                });
+
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `signed-${originalFileName}`;
+                link.click();
+
+                statusMessage.textContent = 'Success! Signed PDF downloaded.';
+            } catch (error) {
+                console.error(error);
+                statusMessage.textContent = 'Error applying signature. Try again.';
+            } finally {
+                signBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

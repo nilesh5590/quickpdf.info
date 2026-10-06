@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR PDF & Image Text Extractor - QuickPDF</title>
+    <meta name="description" content="Extract searchable text from scanned PDFs and images instantly inside your web browser using free client-side OCR.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tesseract.js CDN for Browser OCR -->
+    <script src="https://unpkg.com/tesseract.js@v5.0.5/dist/tesseract.min.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
+        <a href="index.html" class="text-xl font-bold text-blue-600">QuickPDF.info</a>
+        <nav class="space-x-4 text-sm font-medium">
+            <a href="index.html" class="hover:text-blue-600">Home</a>
+            <a href="merge.html" class="hover:text-blue-600">Merge PDF</a>
+            <a href="split.html" class="hover:text-blue-600">Split PDF</a>
+            <a href="compress.html" class="hover:text-blue-600">Compress</a>
+            <a href="sign.html" class="hover:text-blue-600">Sign PDF</a>
+            <a href="ocr.html" class="text-blue-600 font-semibold">OCR Text</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-2xl mx-auto px-4 py-12 flex-grow w-full">
+        <h2 class="text-3xl font-extrabold mb-2 text-center">OCR Text Extractor</h2>
+        <p class="text-gray-600 mb-8 text-center">Extract text from scanned documents or images instantly in your browser.</p>
+
+        <!-- Upload Box -->
+        <div class="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 shadow-sm hover:border-blue-500 transition cursor-pointer text-center" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input" accept="image/*,.pdf" class="hidden">
+            <svg class="w-12 h-12 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <p class="text-lg font-semibold mb-1">Click to select an image or scanned document</p>
+            <p class="text-sm text-gray-400">Supports PNG, JPG, and PDF formats</p>
+        </div>
+
+        <!-- Status & Results -->
+        <div id="result-container" class="mt-6 bg-white border p-6 rounded-xl shadow-sm hidden space-y-4">
+            <h3 id="status-text" class="font-bold text-blue-600 text-sm">Processing OCR...</h3>
+            <textarea id="output-text" rows="8" class="w-full border rounded-lg p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Extracted text will appear here..."></textarea>
+            <button onclick="copyText()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow transition">
+                Copy Extracted Text
+            </button>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t py-4 text-center text-xs text-gray-400">
+        &copy; 2026 QuickPDF.info. 100% Client-Side Privacy Guaranteed.
+    </footer>
+
+    <!-- OCR Logic -->
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const resultContainer = document.getElementById('result-container');
+        const statusText = document.getElementById('status-text');
+        const outputText = document.getElementById('output-text');
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            resultContainer.classList.remove('hidden');
+            statusText.textContent = 'Initializing local OCR engine (Tesseract.js)...';
+            outputText.value = '';
+
+            try {
+                const worker = await Tesseract.createWorker('eng');
+                statusText.textContent = 'Recognizing text from document... Please wait.';
+                
+                const ret = await worker.recognize(file);
+                outputText.value = ret.data.text;
+                statusText.textContent = 'Success! Text extracted successfully.';
+                
+                await worker.terminate();
+            } catch (error) {
+                console.error(error);
+                statusText.textContent = 'Error processing OCR. Please try another file.';
+            }
+        });
+
+        window.copyText = function() {
+            outputText.select();
+            document.execCommand('copy');
+            alert('Extracted text copied to clipboard!');
+        }
+    </script>
+</body>
+</html>
